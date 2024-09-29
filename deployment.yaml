@@ -14,9 +14,11 @@ spec:
       labels:
         app: nginx
     spec:
+      imagePullSecrets:          # Specify the secret here
+      - name: acr-secret         # Name of the secret created for ACR access
       containers:
       - name: nginx
-        image: ${{ secrets.ACR_LOGIN_SERVER }}/my-app:latest # Use the dynamic SHA from the workflow
+        image: frontendmyapp.azurecr.io/my-app:latest  # Use the dynamic SHA from the workflow
         ports:
         - containerPort: 80
 ---
