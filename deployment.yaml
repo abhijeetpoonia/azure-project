@@ -5,7 +5,7 @@ metadata:
   labels:
     app: nginx
 spec:
-  replicas: 3  # Number of pod replicas
+  replicas: 3
   selector:
     matchLabels:
       app: nginx
@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: ${ACR_LOGIN_SERVER}/my-app:SHA_PLACEHOLDER  # Placeholder for the SHA
+        image: ${{ secrets.ACR_LOGIN_SERVER }}/my-app:${{ github.sha }}  # Use the dynamic SHA from the workflow
         ports:
         - containerPort: 80
 ---
@@ -29,6 +29,6 @@ spec:
   selector:
     app: nginx
   ports:
-  - port: 80            # Exposing port 80 of the service
-    targetPort: 80      # Maps to container port 80
-    nodePort: 30007     # Optional, Kubernetes will auto-assign a port if not specified (range: 30000-32767)
+  - port: 80
+    targetPort: 80
+    nodePort: 30007
