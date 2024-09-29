@@ -40,7 +40,6 @@ jobs:
     - name: 'Update Deployment Image'
       run: |
         sed -i "s|${{ secrets.ACR_LOGIN_SERVER }}/my-app:SHA_PLACEHOLDER|${{ secrets.ACR_LOGIN_SERVER }}/my-app:${{ github.sha }}|g" deployment.yaml
-
     # Step 7: Apply the deployment file to the AKS cluster
     - name: 'Deploy to AKS'
       run: |
