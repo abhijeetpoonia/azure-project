@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: ${ACR_LOGIN_SERVER}/my-app:latest  # Use a placeholder for the image
+        image: ${ACR_LOGIN_SERVER}/my-app:SHA_PLACEHOLDER  # Placeholder for the SHA
         ports:
         - containerPort: 80
 ---
