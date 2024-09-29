@@ -20,25 +20,28 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    # Step 3: Build and Push Docker Image
-    - name: 'Build and Push Docker Image'
-      uses: docker/build-push-action@v5
-      with:
-        push: true
-        tags: ${{ secrets.ACR_LOGIN_SERVER }}/my-app:${{ github.sha }}  # Tag with the commit SHA
-        file: Dockerfile  # Adjust the path if your Dockerfile is located elsewhere
+    # Step 3: Build the Docker image from the Dockerfile
+    - name: 'Build Docker Image'
+      run: |
+        docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/my-app:${{ github.sha }} .
 
-    # Step 4: Set up kubectl and configure AKS credentials
+    # Step 4: Push the Docker image to Azure Container Registry (ACR)
+    - name: 'Push Image to ACR'
+      run: |
+        echo ${{ secrets.ACR_PASSWORD }} | docker login ${{ secrets.ACR_LOGIN_SERVER }} -u ${{ secrets.ACR_USERNAME }} --password-stdin
+        docker push ${{ secrets.ACR_LOGIN_SERVER }}/my-app:${{ github.sha }}
+
+    # Step 5: Set up kubectl and configure AKS credentials
     - name: 'Set up kubectl'
       run: |
         az aks get-credentials --resource-group ${{ secrets.AKS_RESOURCE_GROUP }} --name ${{ secrets.AKS_CLUSTER_NAME }}
 
-    # Step 5: Update the deployment file to use the new image SHA
+    # Step 6: Update the deployment file to use the new image SHA
     - name: 'Update Deployment Image'
       run: |
-        sed -i "s|${{ secrets.ACR_LOGIN_SERVER }}/my-app:SHA_PLACEHOLDER|${{ secrets.ACR_LOGIN_SERVER }}/my-app:${{ github.sha }}|g" deployment.yaml
+        sed -i "s|${{ secrets.ACR_LOGIN_SERVER }}/my-app:latest|${{ secrets.ACR_LOGIN_SERVER }}/my-app:${{ github.sha }}|g" deployment.yaml
 
-    # Step 6: Apply the deployment file to the AKS cluster
+    # Step 7: Apply the deployment file to the AKS cluster
     - name: 'Deploy to AKS'
       run: |
         kubectl apply -f deployment.yaml
