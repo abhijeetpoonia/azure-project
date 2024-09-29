@@ -27,10 +27,9 @@ kind: Service
 metadata:
   name: nginx-service
 spec:
-  type: NodePort
+  type: LoadBalancer               # Changed from NodePort to LoadBalancer
   selector:
     app: nginx
   ports:
-  - port: 80
-    targetPort: 80
-    nodePort: 30007
+  - port: 80                       # The port that will be exposed
+    targetPort: 80                 # The port that the container listens on
