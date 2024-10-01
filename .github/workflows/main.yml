@@ -32,9 +32,9 @@ jobs:
           projectBaseDir: "."
           args: >
             -Dsonar.projectKey=azure-project
-            -Dsonar.projectName="azure-project"  # No spaces in project name
+            -Dsonar.projectName="azure-project"   
             -Dsonar.projectVersion=1.0
-            -Dsonar.java.binaries=**/target/classes  # Adjust this path based on your project structure
+            -Dsonar.java.binaries=**/target/classes  
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  # Your SonarQube authentication token
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}  # Your SonarQube server URL
