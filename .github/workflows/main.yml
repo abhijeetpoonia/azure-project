@@ -46,7 +46,7 @@ jobs:
           echo "Vault address is set to $VAULT_ADDR"
           # Fetch multiple secrets and store them in environment variables
           demo=$(vault kv get -field=devops RAW/gopal/abhi)  # Replace with your actual field
-          cloud=$(vault kv get -field=cloud RAW/gopal/cloud_secret)  # Another secret
+          cloud=$(vault kv get -field=cloud RAW/gopal/abhi)  # Another secret
           
           # Store secrets in the $GITHUB_ENV file
           echo "DEMO=${demo}" >> $GITHUB_ENV
