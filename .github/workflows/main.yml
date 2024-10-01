@@ -25,7 +25,7 @@ jobs:
       - name: 'Check Java Version'
         run: java -version
 
-      # Step 6: Login to Vault
+     # Step 6: Login to Vault
       - name: 'Login to Vault'
         env:
           VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}  # Ensure you have this secret set in GitHub
@@ -33,8 +33,9 @@ jobs:
         run: |
           echo "Logging into Vault..."
           echo "Vault address is set to $VAULT_ADDR"
-          demo={vault kv get -filed=devops secrets/RAW/kv/gopal/abhi}
+          demo=$(vault kv get -format=json secrets/RAW/kv/gopal/abhi)  # Use the proper command format
           echo "demo: $demo"
+
 
       # Step 4: Run SonarQube Scan
       - name: 'Run SonarQube Scan'
