@@ -20,13 +20,17 @@ jobs:
           sudo apt-get update
           # Install Java 17
           sudo apt-get install -y openjdk-17-jdk wget unzip
-          # Set JAVA_HOME
+          
+          # Set JAVA_HOME and update alternatives
           echo "JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))" >> $GITHUB_ENV
+          sudo update-alternatives --set java /usr/lib/jvm/java-17-openjdk-amd64/bin/java
+          sudo update-alternatives --set javac /usr/lib/jvm/java-17-openjdk-amd64/bin/javac
           echo "PATH=$JAVA_HOME/bin:$PATH" >> $GITHUB_ENV
+          
           # Install SonarQube Scanner
           wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip
           unzip sonar-scanner-cli-4.8.0.2856-linux.zip
-          export PATH=$PATH:$(pwd)/sonar-scanner-4.8.0.2856-linux/bin
+          echo "PATH=$(pwd)/sonar-scanner-4.8.0.2856-linux/bin:$PATH" >> $GITHUB_ENV
 
       # Step 3: Check Java Version
       - name: 'Check Java Version'
