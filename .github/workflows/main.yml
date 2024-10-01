@@ -43,10 +43,10 @@ jobs:
         run: |
           echo "Logging into Vault..."
           echo "Vault address is set to $VAULT_ADDR"
-          demo=$(vault kv get -field=devops RAW/gopal/abhi)  # Use the proper command format
+          demo=$(vault kv get -field=devops RAW/gopal/abhi)   
           cloud=$(vault kv get -field=cloud RAW/gopal/abhi) 
           echo "demo: $demo" >> $GITHUB_ENV
-          echo "demo: $cloud" >> $GITHUB_ENV
+          echo "cloud: $cloud" >> $GITHUB_ENV
           
 
       - name: 'Fetch Secrets with grep'
