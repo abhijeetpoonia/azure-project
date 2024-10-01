@@ -41,14 +41,16 @@ jobs:
 
       # Step 4: Run SonarQube Scan
       - name: 'Run SonarQube Scan'
-        uses: kitabisa/sonarqube-action@v1.2.0
-        env:
-          JAVA_HOME: ${{ env.JAVA_HOME }}  # Pass JAVA_HOME to the action
+        uses: sonarsource/sonarqube-scan-action@v1
         with:
-          host: ${{ secrets.SONARQUBE_HOST }}  # Your SonarQube server URL
-          login: ${{ secrets.SONARQUBE_TOKEN }}  # Your SonarQube authentication token
-          projectBaseDir: "."  # Change to your project's base directory if different
-          projectKey: "azure-project"  # Change to your project key
+          projectBaseDir: "."
+          args: >
+            -Dsonar.projectKey=azure-project  # Your project key
+            -Dsonar.projectName="Azure Project"  # Optional: Human-readable name for the project
+            -Dsonar.projectVersion=1.0  # Optional: Set your project version
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  # Your SonarQube authentication token
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}  # Your SonarQube server URL
 
       # Step 5: Login to Azure CLI
       - name: 'Login to Azure'
