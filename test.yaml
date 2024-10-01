@@ -1,0 +1,45 @@
+# Configuration for a web application
+
+app:
+  name: "MyWebApp"
+  version: "1.0.0"
+
+server:
+  host: "localhost"
+  port: 8080
+  ssl: true
+
+database:
+  type: "mysql"
+  host: "db-server"
+  port: 3306
+  name: "app_db"
+  user: "admin"
+  password: "secret"
+
+logging:
+  level: "info"
+  file: "/var/log/mywebapp.log"
+
+features:
+  authentication: true
+  payments: true
+  caching:
+    enabled: true
+    type: "redis"
+    ttl: 3600
+
+environment:
+  development:
+    debug: true
+    hot_reload: true
+  production:
+    debug: false
+    hot_reload: false
+
+# List of admins with their emails
+admins:
+  - name: "Alice"
+    email: "alice@example.com"
+  - name: "Bob"
+    email: "bob@example.com"
