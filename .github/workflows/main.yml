@@ -37,6 +37,20 @@ jobs:
           # Push the Docker image to ACR
           docker push $IMAGE_URI
 
+          
+      - name: 'Run SonarQube Scan'
+        uses: SonarSource/sonarcloud-github-action@master
+        with:
+          # Use environment variables to configure SonarQube
+          args: >
+            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
+            -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
+            -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }}
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed for PR decoration
+
+
       # Step 4: Set up kubectl and configure AKS credentials
       - name: 'Set up kubectl'
         run: |
