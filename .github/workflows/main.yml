@@ -59,15 +59,18 @@ jobs:
             exit 1  # Fail the job if the quality gate is not passed
           fi
 
-
+      # Step 6: All subsequent steps should only run if the previous steps were successful (i.e., Quality Gate passed)
+      
       # Step 7: Login to Azure CLI
       - name: 'Login to Azure'
+        if: success()  # Run only if previous steps are successful
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       # Step 8: Build and tag the Docker image with a timestamp
       - name: 'Build and Submit Image'
+        if: success()  # Run only if previous steps are successful
         id: build
         run: |
           TIMESTAMP=$(date +%Y%m%d%H%M%S)
@@ -84,15 +87,18 @@ jobs:
 
       # Step 9: Set up kubectl and configure AKS credentials
       - name: 'Set up kubectl'
+        if: success()  # Run only if previous steps are successful
         run: |
           az aks get-credentials --resource-group ${{ secrets.AKS_RESOURCE_GROUP }} --name ${{ secrets.AKS_CLUSTER_NAME }}
 
       # Step 10: Update the deployment file to use the new image tag    
       - name: 'Update Deployment Image'      
+        if: success()  # Run only if previous steps are successful
         run: |        
           sed -i "s|image: .*|image: ${{ secrets.ACR_LOGIN_SERVER }}/my-app:${{ env.TIMESTAMP }}|g" deployment.yaml    
 
       # Step 11: Apply the deployment file to the AKS cluster    
       - name: 'Deploy to AKS'      
+        if: success()  # Run only if previous steps are successful
         run: |        
           kubectl apply -f deployment.yaml
