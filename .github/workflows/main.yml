@@ -43,7 +43,7 @@ jobs:
         run: |
           echo "Logging into Vault..."
           echo "Vault address is set to $VAULT_ADDR"
-          demo=$(vault kv get -format=json RAW/kv/gopal/abhi)  # Use the proper command format
+          demo=$(vault kv get -field=devops RAW/gopal/abhi)  # Use the proper command format
           echo "demo: $demo"
 
 
