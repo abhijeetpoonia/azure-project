@@ -43,6 +43,14 @@ jobs:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}  
           JAVA_HOME: ${{ steps.setup-java.outputs.java-home }}
 
+       # Step 5: Fetch the Analysis ID
+      - name: 'Fetch Analysis ID'
+        id: fetch_analysis_id
+        run: |
+          # Use the GitHub API to fetch the latest analysis for the project
+          ANALYSIS_ID=$(curl -s -u "${{ secrets.SONAR_TOKEN }}:" "${{ secrets.SONAR_HOST_URL }}/api/project_analyses/search?project=azure-project" | jq -r '.analyses[0].id')
+          echo "ANALYSIS_ID=${ANALYSIS_ID}" >> $GITHUB_ENV
+
       # Step 5: Check SonarQube Quality Gate Status
       - name: 'Check SonarQube Quality Gate Status'
         run: |
