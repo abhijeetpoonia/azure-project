@@ -27,6 +27,7 @@ jobs:
 
       # Step 4: Run SonarQube Scan
       - name: 'Run SonarQube Scan'
+        id: sonar_scan  # Add an ID to this step to reference it later
         uses: sonarsource/sonarqube-scan-action@v3
         with:
           projectBaseDir: "."
@@ -45,16 +46,16 @@ jobs:
       # Step 5: Check SonarQube Quality Gate Status
       - name: 'Check SonarQube Quality Gate Status'
         run: |
-          STATUS_CODE=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.SONAR_HOST_URL }}/api/qualitygates/status?projectKey=azure-project")
+          # Extract the analysis ID from the logs or response
+          ANALYSIS_ID=$(echo "${{ steps.sonar_scan.outputs.scanId }}" | tr -d '\r')  # Adjust as needed to extract analysis ID
 
-          if [[ $STATUS_CODE -ne 200 ]]; then
-            echo "SonarQube request failed with status code: $STATUS_CODE"
-            exit 1
-          fi
+          # Use the analysis ID to check the Quality Gate status
+          RESPONSE=$(curl -s -u "${{ secrets.SONAR_TOKEN }}:" "${{ secrets.SONAR_HOST_URL }}/api/qualitygates/project_status?analysesId=$ANALYSIS_ID")
 
-          # Use jq to parse the JSON response and extract the status based on the quality gate name
-          RESPONSE=$(curl -s -u "${{ secrets.SONAR_TOKEN }}: " "${{ secrets.SONAR_HOST_URL }}/api/qualitygates/status?projectKey=azure-project")
-          STATUS=$(echo "$RESPONSE" | jq -r '.projectStatus.status | .[] | select(.name == "my-quality_gate") | .status')
+          echo "API Response: $RESPONSE"  # Debugging line
+
+          # Check the status
+          STATUS=$(echo "$RESPONSE" | jq -r '.projectStatus.status')
 
           if [ "$STATUS" != "OK" ]; then
             echo "Quality Gate failed: $STATUS"
