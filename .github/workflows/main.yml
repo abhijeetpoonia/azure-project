@@ -31,9 +31,9 @@ jobs:
         with:
           projectBaseDir: "."  # Set the project base directory
           args: >
-            -Dsonar.projectKey=azure-project  # Your project key
-            -Dsonar.projectName="Azure Project"  # Optional: Human-readable name for the project
-            -Dsonar.projectVersion=1.0  # Optional: Set your project version
+            -Dsonar.projectKey=azure-project
+            -Dsonar.projectName="Azure Project"
+            -Dsonar.projectVersion=1.0
             -Dsonar.java.binaries=**/target/classes  # Adjust this path based on your project structure
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  # Your SonarQube authentication token
