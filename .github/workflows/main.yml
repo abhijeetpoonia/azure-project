@@ -41,7 +41,7 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}  
-          JAVA_HOME: ${{ steps.setup-java.outputs.java-home }
+          JAVA_HOME: ${{ steps.setup-java.outputs.java-home }}  # Fixed missing closing bracket
 
       # Step 5: Fetch the Analysis ID
       - name: 'Fetch Analysis ID'
@@ -75,7 +75,7 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       # Step 8: Build and tag the Docker image with a timestamp
-      - name: Build and Submit Image
+      - name: 'Build and Submit Image'
         id: build
         run: |
           TIMESTAMP=$(date +%Y%m%d%H%M%S)
