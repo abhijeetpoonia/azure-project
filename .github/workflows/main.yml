@@ -35,8 +35,8 @@ jobs:
             -Dsonar.projectName="azure-project"  
             -Dsonar.projectVersion=1.0
             -Dsonar.java.binaries=**/target/classes
-            -Dsonar.java.source=17  # Explicitly set Java source version
-            -Dsonar.java.target=17  # Explicitly set Java target version  
+            -Dsonar.java.source=17  
+            -Dsonar.java.target=17  
             env:
             SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  
             SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}  
