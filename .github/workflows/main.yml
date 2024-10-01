@@ -44,7 +44,7 @@ jobs:
           JAVA_HOME: ${{ steps.setup-java.outputs.java-home }}
 
       # Step 5: Fetch the Analysis ID
-      - name: 'Fetch Analysis ID'
+      - name: 'Check SonarQube Quality Gate Status'
         id: fetch_analysis_id
         run: |
           # Use the SonarQube API to fetch the latest analysis for the project
@@ -59,19 +59,6 @@ jobs:
             exit 1  # Fail the job if the quality gate is not passed
           fi
 
-      # Step 6: Check SonarQube Quality Gate Status
-      - name: 'Check SonarQube Quality Gate Status'
-        run: |
-          # Use the environment variable to check the Quality Gate status
-          RESPONSE=$(curl -s -u "${{ secrets.SONAR_TOKEN }}:" "${{ secrets.SONAR_HOST_URL }}/api/qualitygates/project_status?analysisId=${{ env.ANALYSIS_ID }}")
-          echo "API Response: $RESPONSE"  # Debugging line
-          # Check the status
-          STATUS=$(echo "$RESPONSE" | jq -r '.projectStatus.status')
-          if [ "$STATUS" != "OK" ]; then
-            echo "Quality Gate failed: $STATUS"
-            exit 1
-          fi
-          echo "Quality Gate passed: $STATUS"
 
       # Step 7: Login to Azure CLI
       - name: 'Login to Azure'
