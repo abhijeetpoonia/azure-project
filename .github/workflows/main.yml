@@ -33,7 +33,7 @@ jobs:
         run: |
           echo "Logging into Vault..."
           echo "Vault address is set to $VAULT_ADDR"
-          demo={vault kv -filed=devops secrets/RAW/kv/gopal/abhi}
+          demo={vault kv get -filed=devops secrets/RAW/kv/gopal/abhi}
           echo "demo: $demo"
 
       # Step 4: Run SonarQube Scan
