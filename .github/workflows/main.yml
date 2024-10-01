@@ -41,37 +41,31 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}  
-          JAVA_HOME: ${{ steps.setup-java.outputs.java-home }}
+          JAVA_HOME: ${{ steps.setup-java.outputs.java-home }
 
       # Step 5: Fetch the Analysis ID
       - name: 'Fetch Analysis ID'
         id: fetch_analysis_id
         run: |
-          # Use the GitHub API to fetch the latest analysis for the project
+          # Use the SonarQube API to fetch the latest analysis for the project
           RESPONSE=$(curl -s -u "${{ secrets.SONAR_TOKEN }}:" "${{ secrets.SONAR_HOST_URL }}/api/project_analyses/search?project=azure-project")
           echo "Response: $RESPONSE"
           ANALYSIS_ID=$(echo "$RESPONSE" | jq -r '.analyses[0].id')
-          echo "ANALYSIS_ID=${ANALYSIS_ID}" >> $GITHUB_ENV
+          echo "ANALYSIS_ID=${ANALYSIS_ID}" >> $GITHUB_ENV  # Set the ANALYSIS_ID as an environment variable
+          echo "Fetched Analysis ID: $ANALYSIS_ID"  # For debugging purposes
 
       # Step 6: Check SonarQube Quality Gate Status
       - name: 'Check SonarQube Quality Gate Status'
         run: |
-          # Extract the analysis ID from the logs or response
-          ANALYSIS_ID=$(echo "${{ steps.fetch_analysis_id.outputs.ANALYSIS_ID }}" | tr -d '\r')  # Adjusted to reference the correct step
-
-          # Use the analysis ID to check the Quality Gate status
-          RESPONSE=$(curl -s -u "${{ secrets.SONAR_TOKEN }}:" "${{ secrets.SONAR_HOST_URL }}/api/qualitygates/project_status?analysesId=$ANALYSIS_ID")
-
+          # Use the environment variable to check the Quality Gate status
+          RESPONSE=$(curl -s -u "${{ secrets.SONAR_TOKEN }}:" "${{ secrets.SONAR_HOST_URL }}/api/qualitygates/project_status?analysesId=${{ env.ANALYSIS_ID }}")
           echo "API Response: $RESPONSE"  # Debugging line
-
           # Check the status
           STATUS=$(echo "$RESPONSE" | jq -r '.projectStatus.status')
-
           if [ "$STATUS" != "OK" ]; then
             echo "Quality Gate failed: $STATUS"
             exit 1
           fi
-
           echo "Quality Gate passed: $STATUS"
 
       # Step 7: Login to Azure CLI
