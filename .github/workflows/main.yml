@@ -44,12 +44,19 @@ jobs:
           echo "Logging into Vault..."
           echo "Vault address is set to $VAULT_ADDR"
           demo=$(vault kv get -field=devops RAW/gopal/abhi)  # Use the proper command format
-          echo "demo: $demo"
+          cloud=$(vault kv get -field=cloud RAW/gopal/abhi) 
+          echo "demo: $demo" >> $GITHUB_ENV
+          echo "demo: $cloud" >> $GITHUB_ENV
+          
 
-       # Step 6: Login to Vault
-      - name: 'fetch secret'
+      - name: 'Fetch Secrets with grep'
         run: |
-          echo "$demo"
+          # Use grep to extract the variables from the environment
+          fetched_demo=$(grep -E '^demo=' $GITHUB_ENV | cut -d'=' -f2)
+          fetched_cloud=$(grep -E '^cloud=' $GITHUB_ENV | cut -d'=' -f2)
+          
+          echo "Fetched DEMO is: $fetched_demo"
+          echo "Fetched CLOUD is: $fetched_cloud"
 
 
       # Step 4: Run SonarQube Scan
