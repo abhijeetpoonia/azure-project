@@ -13,22 +13,33 @@ jobs:
       - name: 'Checkout GitHub repository'
         uses: actions/checkout@v3
 
-      # Step 2: Run SonarQube Scan
-      - name: 'Run SonarQube Scan'
-        uses: kitabisa/sonarqube-action@v1.2.0
-        with:
-          host: ${{ secrets.SONARQUBE_HOST }}  # Your SonarQube server URL
-          login: ${{ secrets.SONARQUBE_TOKEN }}  # Your SonarQube authentication token
-          projectBaseDir: "."  # Change to your project's base directory if different
-          projectKey: "azure-project"  # Change to your project key
+      # Step 2: Install Java 17 and SonarQube Scanner
+      - name: 'Install Java 17 and SonarQube Scanner'
+        run: |
+          sudo apt-get update
+          # Install Java 17
+          sudo apt-get install -y openjdk-17-jdk wget unzip
+          # Install SonarQube Scanner
+          wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip
+          unzip sonar-scanner-cli-4.8.0.2856-linux.zip
+          export PATH=$PATH:$(pwd)/sonar-scanner-4.8.0.2856-linux/bin
 
-      # Step 3: Login to Azure CLI
+      # Step 3: Run SonarQube Scan
+      - name: 'Run SonarQube Scan'
+        run: |
+          sonar-scanner \
+            -Dsonar.projectKey=azure-project \
+            -Dsonar.sources=. \
+            -Dsonar.host.url=http://3.110.157.75:9000 \
+            -Dsonar.login=${{ secrets.SONARQUBE_TOKEN }}
+
+      # Step 4: Login to Azure CLI
       - name: 'Login to Azure'
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # Step 4: Build and tag the Docker image with a timestamp
+      # Step 5: Build and tag the Docker image with a timestamp
       - name: Build and Submit Image
         id: build
         run: |
@@ -44,17 +55,17 @@ jobs:
           # Push the Docker image to ACR
           docker push $IMAGE_URI
 
-      # Step 5: Set up kubectl and configure AKS credentials
+      # Step 6: Set up kubectl and configure AKS credentials
       - name: 'Set up kubectl'
         run: |
           az aks get-credentials --resource-group ${{ secrets.AKS_RESOURCE_GROUP }} --name ${{ secrets.AKS_CLUSTER_NAME }}   
 
-      # Step 6: Update the deployment file to use the new image tag    
+      # Step 7: Update the deployment file to use the new image tag    
       - name: 'Update Deployment Image'      
         run: |        
           sed -i "s|image: .*|image: ${{ secrets.ACR_LOGIN_SERVER }}/my-app:${{ env.TIMESTAMP }}|g" deployment.yaml    
 
-      # Step 7: Apply the deployment file to the AKS cluster    
+      # Step 8: Apply the deployment file to the AKS cluster    
       - name: 'Deploy to AKS'      
         run: |        
           kubectl apply -f deployment.yaml
