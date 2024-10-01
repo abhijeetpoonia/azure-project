@@ -46,6 +46,11 @@ jobs:
           demo=$(vault kv get -field=devops RAW/gopal/abhi)  # Use the proper command format
           echo "demo: $demo"
 
+       # Step 6: Login to Vault
+      - name: 'fetch secret'
+        run: |
+          echo "$demo"
+
 
       # Step 4: Run SonarQube Scan
       - name: 'Run SonarQube Scan'
