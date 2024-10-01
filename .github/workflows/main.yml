@@ -32,7 +32,7 @@ jobs:
           projectBaseDir: "."  # Set the project base directory
           args: >
             -Dsonar.projectKey=azure-project
-            -Dsonar.projectName="Azure Project"
+            -Dsonar.projectName=Azure Project  # Removed quotes
             -Dsonar.projectVersion=1.0
             -Dsonar.java.binaries=**/target/classes  # Adjust this path based on your project structure
         env:
