@@ -12,14 +12,32 @@ jobs:
       # Step 1: Checkout the repository code
       - name: 'Checkout GitHub repository'
         uses: actions/checkout@v3
-        
-      # Step 2: Login to Azure CLI
+
+      # Step 2: Install SonarQube Scanner (if not available by default)
+      - name: 'Install SonarQube Scanner'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget unzip
+          wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip
+          unzip sonar-scanner-cli-4.6.2.2472-linux.zip
+          export PATH=$PATH:$(pwd)/sonar-scanner-4.6.2.2472-linux/bin
+
+      # Step 3: Run SonarQube Scan
+      - name: 'Run SonarQube Scan'
+        run: |
+          sonar-scanner \
+            -Dsonar.projectKey=azure-project \
+            -Dsonar.sources=. \
+            -Dsonar.host.url=http://3.110.157.75:9000 \
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+
+      # Step 4: Login to Azure CLI
       - name: 'Login to Azure'
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # Step 3: Build and tag the Docker image with a timestamp
+      # Step 5: Build and tag the Docker image with a timestamp
       - name: Build and Submit Image
         id: build
         run: |
@@ -30,38 +48,22 @@ jobs:
           
           # Build the Docker image
           docker build -t $IMAGE_URI .
-
           # Log in to ACR
           echo ${{ secrets.ACR_PASSWORD }} | docker login ${{ secrets.ACR_LOGIN_SERVER }} -u ${{ secrets.ACR_USERNAME }} --password-stdin
-
           # Push the Docker image to ACR
           docker push $IMAGE_URI
 
-          
-      - name: 'Run SonarQube Scan'
-        uses: SonarSource/sonarcloud-github-action@master
-        with:
-          # Use environment variables to configure SonarQube
-          args: >
-            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
-            -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
-            -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }}
-            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed for PR decoration
-
-
-      # Step 4: Set up kubectl and configure AKS credentials
+      # Step 6: Set up kubectl and configure AKS credentials
       - name: 'Set up kubectl'
         run: |
           az aks get-credentials --resource-group ${{ secrets.AKS_RESOURCE_GROUP }} --name ${{ secrets.AKS_CLUSTER_NAME }}   
 
-      # Step 5: Update the deployment file to use the new image tag    
+      # Step 7: Update the deployment file to use the new image tag    
       - name: 'Update Deployment Image'      
         run: |        
           sed -i "s|image: .*|image: ${{ secrets.ACR_LOGIN_SERVER }}/my-app:${{ env.TIMESTAMP }}|g" deployment.yaml    
 
-      # Step 6: Apply the deployment file to the AKS cluster    
+      # Step 8: Apply the deployment file to the AKS cluster    
       - name: 'Deploy to AKS'      
         run: |        
           kubectl apply -f deployment.yaml
