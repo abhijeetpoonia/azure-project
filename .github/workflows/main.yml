@@ -49,7 +49,7 @@ jobs:
         run: |
           # Use the SonarQube API to fetch the latest analysis for the project
            ANALYSIS_ID=$(curl -u "${{ secrets.SONAR_TOKEN }}" "${{ secrets.SONAR_HOST_URL }}/api/project_analyses/search?project=azure-project" | jq -r '.analyses[0].key')
-
+           QUALITY_GATE_STATUS=$(curl -u "${{ secrets.SONAR_TOKEN }}" "${{ secrets.SONAR_HOST_URL }}/api/qualitygates/project_status?analysisId=${ANALYSIS_ID}" | jq -r '.projectStatus.status')
 
       # Step 6: Check SonarQube Quality Gate Status
       - name: 'Check SonarQube Quality Gate Status'
