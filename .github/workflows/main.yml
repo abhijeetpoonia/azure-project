@@ -48,11 +48,7 @@ jobs:
         id: fetch_analysis_id
         run: |
           # Use the SonarQube API to fetch the latest analysis for the project
-          RESPONSE=$(curl -s -u "${{ secrets.SONAR_TOKEN }}:" "${{ secrets.SONAR_HOST_URL }}/api/project_analyses/search?project=azure-project")
-          echo "Response: $RESPONSE"
-          ANALYSIS_ID=$(echo "$RESPONSE" | jq -r '.analyses[0].id')
-          echo "ANALYSIS_ID=${ANALYSIS_ID}" >> $GITHUB_ENV  # Set the ANALYSIS_ID as an environment variable
-          echo "Fetched Analysis ID: $ANALYSIS_ID"  # For debugging purposes
+          curl -u "$SONAR_TOKEN:" "$SONAR_HOST_URL/api/project_analyses/search?project=azure-project" | jq -r '.analyses[0].key'
 
       # Step 6: Check SonarQube Quality Gate Status
       - name: 'Check SonarQube Quality Gate Status'
