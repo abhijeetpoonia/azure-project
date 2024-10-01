@@ -31,6 +31,9 @@ jobs:
           wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip
           unzip sonar-scanner-cli-4.8.0.2856-linux.zip
           echo "PATH=$(pwd)/sonar-scanner-4.8.0.2856-linux/bin:$PATH" >> $GITHUB_ENV
+          
+          # Set SONAR_SCANNER_JAVA to use the installed Java
+          echo "SONAR_SCANNER_JAVA=$JAVA_HOME/bin/java" >> $GITHUB_ENV
 
       # Step 3: Check Java Version
       - name: 'Check Java Version'
