@@ -45,20 +45,16 @@ jobs:
       # Step 5: Check SonarQube Quality Gate Status
       - name: 'Check SonarQube Quality Gate Status'
         run: |
-          STATUS_CODE=$(curl -s -o /dev/null -w "%{http_code}"  "${{ secrets.SONAR_HOST_URL }}/api/qualitygates/status?projectKey=azure-project")
+          STATUS_CODE=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.SONAR_HOST_URL }}/api/qualitygates/status?projectKey=azure-project")
 
           if [[ $STATUS_CODE -ne 200 ]]; then
             echo "SonarQube request failed with status code: $STATUS_CODE"
             exit 1
           fi
 
-          # Try parsing the response for status (assuming success response)
+          # Use jq to parse the JSON response and extract the status based on the quality gate name
           RESPONSE=$(curl -s -u "${{ secrets.SONAR_TOKEN }}: " "${{ secrets.SONAR_HOST_URL }}/api/qualitygates/status?projectKey=azure-project")
-          
-          # Print the full response for debugging purposes
-          echo "Response from SonarQube: $RESPONSE"
-
-          STATUS=$(echo "$RESPONSE" | grep -Eo '"status": "[^"]*' | cut -d '"' -f2)
+          STATUS=$(echo "$RESPONSE" | jq -r '.projectStatus.status | select(.name == "my-quality_gate")')
 
           if [ "$STATUS" != "OK" ]; then
             echo "Quality Gate failed: $STATUS"
