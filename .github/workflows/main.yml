@@ -19,7 +19,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: '17'
-          distribution: 'temurin'  # Using Temurin as the distribution
+          distribution: 'temurin'
 
       # Step 3: Check Java Version
       - name: 'Check Java Version'
@@ -27,7 +27,7 @@ jobs:
 
       # Step 4: Run SonarQube Scan
       - name: 'Run SonarQube Scan'
-        id: sonar_scan  # Add an ID to this step to reference it later
+        id: sonar_scan
         uses: sonarsource/sonarqube-scan-action@v3
         with:
           projectBaseDir: "."
@@ -41,21 +41,29 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}  
-          JAVA_HOME: ${{ steps.setup-java.outputs.java-home }}  # Fixed missing closing bracket
+          JAVA_HOME: ${{ steps.setup-java.outputs.java-home }}
 
       # Step 5: Fetch the Analysis ID
       - name: 'Fetch Analysis ID'
         id: fetch_analysis_id
         run: |
           # Use the SonarQube API to fetch the latest analysis for the project
-           ANALYSIS_ID=$(curl -u "${{ secrets.SONAR_TOKEN }}" "${{ secrets.SONAR_HOST_URL }}/api/project_analyses/search?project=azure-project" | jq -r '.analyses[0].key')
-           QUALITY_GATE_STATUS=$(curl -u "${{ secrets.SONAR_TOKEN }}" "${{ secrets.SONAR_HOST_URL }}/api/qualitygates/project_status?analysisId=${ANALYSIS_ID}" | jq -r '.projectStatus.status')
+          ANALYSIS_ID=$(curl -u "${{ secrets.SONAR_TOKEN }}" "${{ secrets.SONAR_HOST_URL }}/api/project_analyses/search?project=azure-project" | jq -r '.analyses[0].key')
+          QUALITY_GATE_STATUS=$(curl -u "${{ secrets.SONAR_TOKEN }}" "${{ secrets.SONAR_HOST_URL }}/api/qualitygates/project_status?analysisId=${ANALYSIS_ID}" | jq -r '.projectStatus.status')
+    
+          # Check if the Quality Gate passed or failed
+          if [ "$QUALITY_GATE_STATUS" = "OK" ]; then
+            echo "Quality status: passed"
+          else
+            echo "Quality status: failed"
+            exit 1  # Fail the job if the quality gate is not passed
+          fi
 
       # Step 6: Check SonarQube Quality Gate Status
       - name: 'Check SonarQube Quality Gate Status'
         run: |
           # Use the environment variable to check the Quality Gate status
-          RESPONSE=$(curl -s -u "${{ secrets.SONAR_TOKEN }}:" "${{ secrets.SONAR_HOST_URL }}/api/qualitygates/project_status?analysesId=${{ env.ANALYSIS_ID }}")
+          RESPONSE=$(curl -s -u "${{ secrets.SONAR_TOKEN }}:" "${{ secrets.SONAR_HOST_URL }}/api/qualitygates/project_status?analysisId=${{ env.ANALYSIS_ID }}")
           echo "API Response: $RESPONSE"  # Debugging line
           # Check the status
           STATUS=$(echo "$RESPONSE" | jq -r '.projectStatus.status')
