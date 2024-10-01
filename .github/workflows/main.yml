@@ -36,6 +36,7 @@ jobs:
           vault -v  # Verify installation
 
      # Step 6: Login to Vault
+       # Step 3: Login to Vault and Fetch Secrets
       - name: 'Login to Vault'
         env:
           VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}  # Ensure you have this secret set in GitHub
@@ -43,20 +44,20 @@ jobs:
         run: |
           echo "Logging into Vault..."
           echo "Vault address is set to $VAULT_ADDR"
-          demo=$(vault kv get -field=devops RAW/gopal/abhi)   
-          cloud=$(vault kv get -field=cloud RAW/gopal/abhi) 
-          echo "demo: $demo" >> $GITHUB_ENV
-          echo "cloud: $cloud" >> $GITHUB_ENV
+          # Fetch multiple secrets and store them in environment variables
+          demo=$(vault kv get -field=devops RAW/gopal/abhi)  # Replace with your actual field
+          cloud=$(vault kv get -field=cloud RAW/gopal/cloud_secret)  # Another secret
           
+          # Store secrets in the $GITHUB_ENV file
+          echo "DEMO=${demo}" >> $GITHUB_ENV
+          echo "CLOUD=${cloud}" >> $GITHUB_ENV
 
+      # Step 4: Use grep to Fetch Secrets
       - name: 'Fetch Secrets with grep'
         run: |
           # Use grep to extract the variables from the environment
-          fetched_demo=$(grep -E '^demo=' $GITHUB_ENV | cut -d'=' -f2)
-          fetched_cloud=$(grep -E '^cloud=' $GITHUB_ENV | cut -d'=' -f2)
-          
-          echo "Fetched DEMO is: $fetched_demo"
-          echo "Fetched CLOUD is: $fetched_cloud"
+          fetched_demo=$(grep -E '^DEMO=' $GITHUB_ENV | cut -d'=' -f2)
+          fetched_cloud=$(grep -E '^CLOUD=' $GITHUB_ENV | cut -d'=' -f2)
 
 
       # Step 4: Run SonarQube Scan
