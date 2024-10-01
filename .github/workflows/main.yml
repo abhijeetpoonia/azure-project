@@ -54,6 +54,10 @@ jobs:
 
           # Try parsing the response for status (assuming success response)
           RESPONSE=$(curl -s -u "${{ secrets.SONAR_TOKEN }}: " "${{ secrets.SONAR_HOST_URL }}/api/qualitygates/status?projectKey=azure-project")
+          
+          # Print the full response for debugging purposes
+          echo "Response from SonarQube: $RESPONSE"
+
           STATUS=$(echo "$RESPONSE" | grep -Eo '"status": "[^"]*' | cut -d '"' -f2)
 
           if [ "$STATUS" != "OK" ]; then
