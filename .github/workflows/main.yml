@@ -37,10 +37,10 @@ jobs:
             -Dsonar.java.binaries=**/target/classes
             -Dsonar.java.source=17  
             -Dsonar.java.target=17  
-            env:
-            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  
-            SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}  
-            JAVA_HOME: ${{ steps.setup-java.outputs.java-home }}
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}  
+          JAVA_HOME: ${{ steps.setup-java.outputs.java-home }}
 
       # Step 5: Login to Azure CLI
       - name: 'Login to Azure'
