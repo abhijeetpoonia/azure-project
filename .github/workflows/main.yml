@@ -27,18 +27,20 @@ jobs:
 
       # Step 4: Run SonarQube Scan
       - name: 'Run SonarQube Scan'
-        uses: sonarsource/sonarqube-scan-action@v1
+        uses: sonarsource/sonarqube-scan-action@v3
         with:
           projectBaseDir: "."
           args: >
             -Dsonar.projectKey=azure-project
-            -Dsonar.projectName="azure-project"   
+            -Dsonar.projectName="azure-project"  
             -Dsonar.projectVersion=1.0
-            -Dsonar.java.binaries=**/target/classes  
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}  
-          JAVA_HOME: ${{ steps.setup-java.outputs.java-home }}
+            -Dsonar.java.binaries=**/target/classes
+            -Dsonar.java.source=17  # Explicitly set Java source version
+            -Dsonar.java.target=17  # Explicitly set Java target version  
+          env:
+            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  
+            SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}  
+            JAVA_HOME: ${{ steps.setup-java.outputs.java-home }}
 
       # Step 5: Login to Azure CLI
       - name: 'Login to Azure'
