@@ -39,8 +39,8 @@ jobs:
        # Step 3: Login to Vault and Fetch Secrets
       - name: 'Login to Vault'
         env:
-          VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}  # Ensure you have this secret set in GitHub
-          VAULT_ADDR: ${{ secrets.VAULT_ADDR }}    # Use the secret for the Vault address
+          VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}  
+          VAULT_ADDR: ${{ secrets.VAULT_ADDR }}    
         run: |
           echo "Logging into Vault..."
           echo "Vault address is set to $VAULT_ADDR"
@@ -91,21 +91,20 @@ jobs:
             echo "Quality status: passed"
           else
             echo "Quality status: failed"
-            exit 1  # Fail the job if the quality gate is not passed
+            exit 1  
           fi
-
-      # Step 6: All subsequent steps should only run if the previous steps were successful (i.e., Quality Gate passed)
+ 
       
       # Step 7: Login to Azure CLI
       - name: 'Login to Azure'
-        if: success()  # Run only if previous steps are successful
+        if: success()  
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       # Step 8: Build and tag the Docker image with a timestamp
       - name: 'Build and Submit Image'
-        if: success()  # Run only if previous steps are successful
+        if: success()   
         id: build
         run: |
           TIMESTAMP=$(date +%Y%m%d%H%M%S)
