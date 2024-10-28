@@ -29,7 +29,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y unzip
-          curl -o vault.zip https://releases.hashicorp.com/vault/1.14.0/vault_1.14.0_linux_amd64.zip  # Adjust version as needed
+          curl -o vault.zip https://releases.hashicorp.com/vault/1.14.0/vault_1.14.0_linux_amd64.zip   
           unzip vault.zip
           sudo mv vault /usr/local/bin/
           rm vault.zip
@@ -45,8 +45,8 @@ jobs:
           echo "Logging into Vault..."
           echo "Vault address is set to $VAULT_ADDR"
           # Fetch multiple secrets and store them in environment variables
-          demo=$(vault kv get -field=devops RAW/gopal/abhi)  # Replace with your actual field
-          cloud=$(vault kv get -field=cloud RAW/gopal/abhi)  # Another secret
+          demo=$(vault kv get -field=devops RAW/gopal/abhi)   
+          cloud=$(vault kv get -field=cloud RAW/gopal/abhi)  
           
           # Store secrets in the $GITHUB_ENV file
           echo "DEMO=${demo}" >> $GITHUB_ENV
@@ -110,7 +110,7 @@ jobs:
           TIMESTAMP=$(date +%Y%m%d%H%M%S)
           IMAGE_URI=${{ secrets.ACR_LOGIN_SERVER }}/my-app:$TIMESTAMP
           echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
-          echo "TIMESTAMP=$TIMESTAMP" >> $GITHUB_ENV  # Store timestamp for later use
+          echo "TIMESTAMP=$TIMESTAMP" >> $GITHUB_ENV   
           
           # Build the Docker image
           docker build -t $IMAGE_URI .
@@ -121,18 +121,18 @@ jobs:
 
       # Step 9: Set up kubectl and configure AKS credentials
       - name: 'Set up kubectl'
-        if: success()  # Run only if previous steps are successful
+        if: success()  
         run: |
           az aks get-credentials --resource-group ${{ secrets.AKS_RESOURCE_GROUP }} --name ${{ secrets.AKS_CLUSTER_NAME }}
 
       # Step 10: Update the deployment file to use the new image tag    
       - name: 'Update Deployment Image'      
-        if: success()  # Run only if previous steps are successful
+        if: success()  
         run: |        
           sed -i "s|image: .*|image: ${{ secrets.ACR_LOGIN_SERVER }}/my-app:${{ env.TIMESTAMP }}|g" deployment.yaml    
 
       # Step 11: Apply the deployment file to the AKS cluster    
       - name: 'Deploy to AKS'      
-        if: success()  # Run only if previous steps are successful
+        if: success()   
         run: |        
           kubectl apply -f deployment.yaml
