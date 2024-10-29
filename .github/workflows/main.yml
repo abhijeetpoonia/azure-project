@@ -131,7 +131,7 @@ jobs:
         run: |        
           sed -i "s|image: .*|image: ${{ secrets.ACR_LOGIN_SERVER }}/my-app:${{ env.TIMESTAMP }}|g" deployment.yaml    
 
-      # Step 11: Apply the deployment file to the AKS cluster
+      # Step 11: Apply the deployment file to the AKS cluster.
       - name: 'Deploy to AKS'      
         if: success()   
         run: |        
