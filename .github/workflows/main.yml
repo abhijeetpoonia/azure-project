@@ -95,7 +95,7 @@ jobs:
           fi
  
       
-      # Step 7: Login to Azure CLI
+      # Step 7: Login to Azure CLI.
       - name: 'Login to Azure'
         if: success()  
         uses: azure/login@v1
