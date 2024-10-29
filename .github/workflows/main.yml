@@ -35,7 +35,7 @@ jobs:
           rm vault.zip
           vault -v  # Verify installation
 
-     # Step 6: Login to Vault
+     # Step 6: Login to Vault.
        # Step 3: Login to Vault and Fetch Secrets
       - name: 'Login to Vault'
         env:
