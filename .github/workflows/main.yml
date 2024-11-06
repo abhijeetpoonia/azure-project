@@ -21,7 +21,7 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # Step 3: Check Java Version
+      # Step 3: Check Java Version.
       - name: 'Check Java Version'
         run: java -version
 
