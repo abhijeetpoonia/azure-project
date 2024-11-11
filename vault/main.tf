@@ -369,7 +369,7 @@ resource "azurerm_network_security_group" "private_vm_nsg" {
     environment = var.environment
   }
 }
-############################3this is for mysql azure private-endpoint##########################################
+############################# this is for mysql azure private-endpoint ##########################################
 #   # Allow MySQL traffic from the private VM to the MySQL server via the Private Endpoint
 #   security_rule {
 #     name                       = "AllowMySQLFromPrivateVM"
